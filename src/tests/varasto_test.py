@@ -38,3 +38,63 @@ class TestVarasto(unittest.TestCase):
 
         # varastossa pitäisi olla tilaa 10 - 8 + 2 eli 4
         self.assertAlmostEqual(self.varasto.paljonko_mahtuu(), 4)
+
+    # An invalid (negative) capacity is reset to 0
+    def test_virheellinen_tilavuus_nollataan(self):
+        varasto = Varasto(-1)
+
+        self.assertAlmostEqual(varasto.tilavuus, 0)
+
+    # A negative starting balance is reset to 0
+    def test_negatiivinen_alkusaldo_nollataan(self):
+        varasto = Varasto(10, -1)
+
+        self.assertAlmostEqual(varasto.saldo, 0)
+
+    # A starting balance that fits in the warehouse is kept as is
+    def test_alkusaldo_mahtuu_varastoon(self):
+        varasto = Varasto(10, 5)
+
+        self.assertAlmostEqual(varasto.saldo, 5)
+
+    # A starting balance larger than the capacity just fills the warehouse
+    def test_liian_suuri_alkusaldo_tayttaa_varaston(self):
+        varasto = Varasto(10, 15)
+
+        self.assertAlmostEqual(varasto.saldo, 10)
+
+    # Adding a negative amount does not change the balance
+    def test_negatiivinen_lisays_ei_muuta_saldoa(self):
+        self.varasto.lisaa_varastoon(-1)
+
+        self.assertAlmostEqual(self.varasto.saldo, 0)
+
+    # Adding more than fits fills the warehouse and the excess is lost
+    def test_liian_suuri_lisays_tayttaa_varaston(self):
+        self.varasto.lisaa_varastoon(15)
+
+        self.assertAlmostEqual(self.varasto.saldo, 10)
+
+    # Taking a negative amount returns 0 and does not change the balance
+    def test_negatiivinen_ottaminen_palauttaa_nollan(self):
+        self.varasto.lisaa_varastoon(8)
+
+        saatu_maara = self.varasto.ota_varastosta(-1)
+
+        self.assertAlmostEqual(saatu_maara, 0)
+        self.assertAlmostEqual(self.varasto.saldo, 8)
+
+    # Taking more than the balance returns everything there is and empties the warehouse
+    def test_liian_suuri_ottaminen_palauttaa_koko_saldon(self):
+        self.varasto.lisaa_varastoon(8)
+
+        saatu_maara = self.varasto.ota_varastosta(10)
+
+        self.assertAlmostEqual(saatu_maara, 8)
+        self.assertAlmostEqual(self.varasto.saldo, 0)
+
+    # The string form shows the balance and the remaining free space
+    def test_merkkijonoesitys(self):
+        self.varasto.lisaa_varastoon(8)
+
+        self.assertEqual(str(self.varasto), "saldo = 8, vielä tilaa 2")
