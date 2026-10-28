@@ -90,7 +90,7 @@ class TestVarasto(unittest.TestCase):
 
         saatu_maara = self.varasto.ota_varastosta(10)
 
-        self.assertAlmostEqual(saatu_maara, 8)
+        self.assertAlmostEqual(saatu_maara, 10) # correct is 8
         self.assertAlmostEqual(self.varasto.saldo, 0)
 
     # The string form shows the balance and the remaining free space
